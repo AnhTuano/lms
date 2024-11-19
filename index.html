@@ -154,7 +154,7 @@
         // Function to validate and enable download
         function validateJson() {
             try {
-                const clipboardText = jsonInput.value;
+                const clipboardText = jsonInput.value.trim(); // Trim any whitespace
                 const jsonData = JSON.parse(clipboardText); // Try parsing JSON
 
                 if (jsonData.data) {
