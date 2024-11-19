@@ -42,7 +42,6 @@
             resize: none;
             margin-bottom: 20px;
             transition: border-color 0.3s ease;
-            animation: fadeInText 1.5s ease-out;
         }
         textarea:focus {
             border-color: #4CAF50;
@@ -57,7 +56,6 @@
             border-radius: 8px;
             cursor: pointer;
             transition: background-color 0.3s ease;
-            animation: fadeInText 2s ease-out;
         }
         #pasteBtn {
             background-color: #2196F3;
@@ -118,7 +116,6 @@
             margin-top: 20px;
             font-size: 0.875rem;
             color: #888;
-            animation: fadeInText 2s ease-out;
         }
 
         span {
@@ -131,7 +128,7 @@
     <div class="container">
         <h1>Tải tài liệu trên LMS</h1>
         <!-- Textarea for user to input JSON -->
-        <textarea id="jsonInput" placeholder="Dán JSON của bạn vào đây..." readonly></textarea>
+        <textarea id="jsonInput" placeholder="Dán JSON của bạn vào đây..."></textarea>
 
         <!-- Buttons for pasting and downloading -->
         <div class="btn-container">
@@ -154,15 +151,11 @@
         const downloadBtn = document.getElementById("downloadBtn");
         const errorMessage = document.getElementById("errorMessage");
 
-        // Function to read from clipboard and paste into the textarea
-        pasteBtn.addEventListener("click", async function() {
+        // Function to validate and enable download
+        function validateJson() {
             try {
-                // Use Clipboard API to get the content from clipboard
-                const clipboardText = await navigator.clipboard.readText();
-                jsonInput.value = clipboardText;  // Paste the text into the textarea
-
-                // Try to parse the JSON from the clipboard text
-                const jsonData = JSON.parse(clipboardText);
+                const clipboardText = jsonInput.value;
+                const jsonData = JSON.parse(clipboardText); // Try parsing JSON
 
                 if (jsonData.data) {
                     errorMessage.textContent = "";  // Clear any previous error message
@@ -176,8 +169,27 @@
                 errorMessage.textContent = "Định dạng JSON không hợp lệ. Vui lòng kiểm tra lại!";
                 downloadBtn.disabled = true;
             }
+        }
+
+        // Function to read from clipboard and paste into the textarea
+        pasteBtn.addEventListener("click", async function() {
+            try {
+                // Use Clipboard API to get the content from clipboard
+                const clipboardText = await navigator.clipboard.readText();
+                jsonInput.value = clipboardText;  // Paste the text into the textarea
+
+                // Validate the JSON after pasting
+                validateJson();
+            } catch (error) {
+                errorMessage.textContent = "Lỗi khi dán nội dung từ clipboard!";
+                downloadBtn.disabled = true;
+            }
         });
 
+        // Event listener for input change in textarea
+        jsonInput.addEventListener('input', validateJson);
+
+        // Event listener for the download button click
         downloadBtn.addEventListener("click", function() {
             const fileUrl = downloadBtn.dataset.url;
 
